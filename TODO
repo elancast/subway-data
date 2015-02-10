@@ -1,0 +1,65 @@
+GOAL: Track how long it takes for subway to get from 86 to various stops and vice versa
+Want to see times on average by time of day, weekend vs week day
+Need to run script regularly to populate
+Then need to graph
+
+ALG:
+  if 86th st and didn't see it previously in time,
+
+want to be able to ID each train and track when it leaves where
+interested in when train arrives at each station - which is the last scheduled time we see for a specific train
+ -> interested in when train times disappear!
+
+In that case:
+- only care about top 3-5 trains
+- when get new data:
+  - compare with previous data
+  - find "ID" per train based on distance from previous data
+  - record if a train has left
+
+to find ID:
+- can assume trains will always be in order
+- look at train leaving previous station
+
+
+when found a train left:
+- look at previous station to give it the same ID as the last train that left that
+- if no previous station, assign new ID
+
+to find train left:
+- look at first train time
+- grab previous time's data
+- a train left if first train time is closer to prev[1] than prev[0]
+
+store:
+- raw train times:
+  [ station ID, train time, iteration timestamp ]
+- leaving times:
+  [ station ID, train ID, train time, direction ]
+- train IDs:
+  [ train ID, direction ]
+
+86:
+  http://apps.mta.info/trainTime/getTimesByStation.aspx?stationID=626&time=1423535581
+
+59:
+  http://apps.mta.info/trainTime/getTimesByStation.aspx?stationID=629&time=1423535609
+
+Grand central:
+  http://apps.mta.info/trainTime/getTimesByStation.aspx?stationID=631&time=1423535650
+
+Union square:
+  http://apps.mta.info/trainTime/getTimesByStation.aspx?stationID=635&time=1423535668
+
+Astor place:
+  http://apps.mta.info/trainTime/getTimesByStation.aspx?stationID=636&time=1423535683
+
+
+4,1423536720,1423536720,401,,127450_4..N06R,1423536308,1
+["4", "1423536720", "1423536720", "401", "", "127450_4..N06R", "1423536308", "1"]
+ 0    1             2             3      4   5                 6             7
+
+if data[3] == '': data is bad! ignore!
+scheduledTime = data[1] ?: data[2]
+
+if data[4] != '': delay!
