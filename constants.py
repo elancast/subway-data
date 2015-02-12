@@ -3,6 +3,10 @@ def enum(**enums):
     return type('Enum', (), enums)
 
 Direction = enum(UPTOWN=1, DOWNTOWN=2)
+DirectionNames = {
+    1: 'Uptown',
+    2: 'Dwntwn',
+    }
 
 Station = enum(
     S86 = 626,
@@ -17,6 +21,19 @@ Station = enum(
     UNION_SQUARE = 635,
     ASTOR_PLACE = 636,
     )
+StationNames = {
+    626: '86th',
+    627: '77th',
+    628: '68th',
+    629: '59th',
+    630: '51st',
+    631: '42nd',
+    632: '33rd',
+    633: '28th',
+    634: '23rd',
+    635: '14th',
+    636: 'Astr',
+    }
 
 Subway = enum(
     L6 = '6',

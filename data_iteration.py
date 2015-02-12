@@ -1,4 +1,4 @@
-from constants import Direction, Line, Station, Subway
+from constants import Direction, DirectionNames, Line, Station, StationNames, Subway
 from db_store import DBStore
 from mta_data import get_times
 
@@ -7,6 +7,10 @@ ALL_STATIONS = Line[Direction.UPTOWN][Subway.L6]
 
 # Max amount of time the scheduled time can vary by for us to think it's the same
 MAX_SIMILAR_TIME = 60
+
+def print_departure(station, line, direction, train, time):
+    print DirectionNames[direction], line, 'departed', StationNames[station],
+    print '  (%d)' % train
 
 def save_all_times(db, times):
     for station in times:
@@ -47,14 +51,13 @@ def get_previous_station(station, line, direction):
 def get_train_id(db, station, line, direction):
     prev_station = get_previous_station(station, line, direction)
     train_id = db.get_latest_train_id(prev_station, line, direction)
-    print 'previous train id:', train_id, prev_station
     if train_id == None:
         train_id = db.save_new_train(line, direction)
     return train_id
 
 def handle_departure(db, station, line, direction, time):
-    print 'DEPARTURE', station, line, direction, time
     train_id = get_train_id(db, station, line, direction)
+    print_departure(station,line, direction, train_id, time)
     db.save_leaving_time(station, line, direction, train_id, time)
 
 def store_departed_trains(db, times):
