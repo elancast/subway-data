@@ -1,2 +1,4 @@
 *.pyc
 *.db
+*.shh
+play_with_api.py

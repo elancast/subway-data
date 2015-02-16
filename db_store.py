@@ -2,10 +2,11 @@ import datetime
 import sqlite3
 
 DELIM = '|'
+DB = 'api_times.db'
 
 class DBStore:
     def __init__(self):
-        self._conn = sqlite3.connect('times.db')
+        self._conn = sqlite3.connect(DB)
 
     def save_train_times(self, station_id, line, direction, times):
         times = DELIM.join(times)
@@ -61,6 +62,45 @@ class DBStore:
         if results == None:
             return None
         return [] if results[1] == None else results[1].split(DELIM)
+
+    def write_stops(self, train_id, line, stops):
+        stops = map(lambda stop: '%s,%d' % (stop.id, stop.time), stops)
+        if len(stops) == 0:
+            self._conn.execute(
+                'DELETE FROM api_times ' +
+                'WHERE train_id=? ',
+                (train_id,)
+                )
+        else:
+            self._conn.execute(
+                'REPLACE INTO api_times ' +
+                ' (train_id, line, remaining_stops) ' +
+                'VALUES (?, ?, ?) ',
+                (train_id, line, DELIM.join(stops)),
+                )
+        self._conn.commit()
+
+    def write_missing_stop(self, train_id, line, stop, time):
+        self._conn.execute(
+            'INSERT INTO api_leaving_times ' +
+            ' (train_id, line, stop, departure) ' +
+            'VALUES (?, ?, ?, ?) ',
+            (train_id, line, stop, time),
+            )
+        self._conn.commit()
+
+    def get_api_prev_stops(self, train_id):
+        cursor = self._conn.execute(
+            'SELECT remaining_stops FROM api_times ' +
+            'WHERE train_id=? ',
+            (train_id, )
+            )
+        results = cursor.fetchone()
+        results = None if results == None else results[0]
+        if not results:
+            return None
+        stops = results.split(DELIM)
+        return map(lambda stop: stop.split(','), stops)
 
     def _get_now(self):
         return int(datetime.datetime.now().strftime('%s'))

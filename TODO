@@ -3,6 +3,12 @@ Want to see times on average by time of day, weekend vs week day
 Need to run script regularly to populate
 Then need to graph
 
+
+https://developers.google.com/transit/gtfs-realtime/code-samples#python
+http://datamine.mta.info/sites/all/files/pdfs/GTFS-Realtime-NYC-Subway%20version%201%20dated%207%20Sep.pdf
+
+
+
 ALG:
   if 86th st and didn't see it previously in time,
 
@@ -63,3 +69,9 @@ if data[3] == '': data is bad! ignore!
 scheduledTime = data[1] ?: data[2]
 
 if data[4] != '': delay!
+
+
+
+V2:
+- want to store train_id + all its stop times
+- mark departure time when we lose a stop time

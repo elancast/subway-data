@@ -28,3 +28,16 @@ CREATE TABLE if not exists trains (
   direction INT NOT NULL,
   timestamp INT NOT NULL
 );
+
+CREATE TABLE if not exists api_times (
+  train_id TEXT NOT NULL PRIMARY KEY,
+  line TEXT NOT NULL,
+  remaining_stops TEXT NOT NULL -- stop_id,time|stop_id,time|...
+);
+
+CREATE TABLE if not exists api_leaving_times (
+  train_id TEXT NOT NULL,
+  line TEXT NOT NULL,
+  stop TEXT NOT NULL,
+  departure INT NOT NULL
+);
