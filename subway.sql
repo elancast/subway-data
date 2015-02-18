@@ -36,8 +36,15 @@ CREATE TABLE if not exists api_times (
 );
 
 CREATE TABLE if not exists api_leaving_times (
-  train_id TEXT NOT NULL,
+  id INT NOT NULL,
+  mta_train_id TEXT NOT NULL,
   line TEXT NOT NULL,
   stop TEXT NOT NULL,
   departure INT NOT NULL
+);
+
+CREATE TABLE if not exists api_train_ids (
+  id INTEGER PRIMARY KEY,
+  train_id TEXT NOT NULL,
+  timestamp INT NOT NULL
 );

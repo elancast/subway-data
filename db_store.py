@@ -3,6 +3,7 @@ import sqlite3
 
 DELIM = '|'
 DB = 'api_times.db'
+HOUR = 60 * 60
 
 class DBStore:
     def __init__(self):
@@ -80,12 +81,13 @@ class DBStore:
                 )
         self._conn.commit()
 
-    def write_missing_stop(self, train_id, line, stop, time):
+    def write_missing_stop(self, mta_train_id, line, stop, time):
+        id = self.get_api_train_id(mta_train_id)
         self._conn.execute(
             'INSERT INTO api_leaving_times ' +
-            ' (train_id, line, stop, departure) ' +
-            'VALUES (?, ?, ?, ?) ',
-            (train_id, line, stop, time),
+            ' (id, mta_train_id, line, stop, departure) ' +
+            'VALUES (?, ?, ?, ?, ?) ',
+            (id, mta_train_id, line, stop, time),
             )
         self._conn.commit()
 
@@ -101,6 +103,32 @@ class DBStore:
             return None
         stops = results.split(DELIM)
         return map(lambda stop: stop.split(','), stops)
+
+    def get_api_train_id(self, mta_train_id):
+        timestamp = self._get_now()
+        cursor = self._conn.execute(
+            'SELECT id FROM api_train_ids ' +
+            'WHERE train_id=? AND timestamp>=? ',
+            (mta_train_id, timestamp - HOUR)
+            )
+        results = cursor.fetchone()
+        if results != None and results[0]:
+            return int(results[0])
+        else:
+            return self._save_new_api_train_id(mta_train_id)
+
+    def _save_new_api_train_id(self, mta_train_id):
+        cursor = self._conn.cursor()
+        cursor.execute(
+            'INSERT INTO api_train_ids ' +
+            ' (train_id, timestamp) ' +
+            'VALUES (?, ?)',
+            (mta_train_id, self._get_now())
+            )
+
+        id = cursor.lastrowid
+        self._conn.commit()
+        return id
 
     def _get_now(self):
         return int(datetime.datetime.now().strftime('%s'))

@@ -39,15 +39,16 @@ def write_leaving_times(curr):
 
     curr_stops = curr.get_stops()
     if len(prev_stops) < len(curr_stops):
-        print 'wtf? we gained a stop somehow?'
-        import pdb; pdb.set_trace()
+        print 'wtf? we gained a stop somehow?', curr.get_train_id()
+        return
     if len(prev_stops) == len(curr_stops):
         return
 
     missing_stops = prev_stops[0 : len(prev_stops) - len(curr_stops)]
     missing_stops.reverse()
 
-    print ' ', curr.get_line(), 'departures:'
+    train_id = db.get_api_train_id(curr.get_train_id())
+    print ' ', curr.get_line(), 'departures for train %d:' % train_id
     for stop in missing_stops:
         db.write_missing_stop(
             curr.get_train_id(),
